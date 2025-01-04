@@ -53,7 +53,7 @@
         .sidebar a {
             color: white;
             text-decoration: none;
-            padding: 15px;
+            padding: 8px;
             display: block;
             border-radius: 5px;
             margin: 5px 10px;
@@ -87,7 +87,6 @@
             background-color: #343a40;
             color: white;
             text-align: center;
-            padding: 1rem 0;
             margin-top: auto;
         }
 
@@ -120,6 +119,13 @@
         <a href="{{ route('customers.index') }}"><i class="fas fa-users"></i> Customers</a>
         <a href="{{ route('reservations.index') }}"><i class="fas fa-calendar-check"></i> Reservations</a>
         <a href="{{ route('bookings.index') }}"><i class="fas fa-book"></i> Bookings</a>
+        <a href="#"><i class="fas fa-book"></i> Check In</a>
+        <a href="#"><i class="fas fa-book"></i> Check Out</a>
+        <a href="#"><i class="fas fa-book"></i> Addtional Charges </a>
+        <a href="#"><i class="fas fa-book"></i> Reports</a>
+        <a href="{{ route('taxes.index') }}"><i class="fas fa-book"></i> Tax Master</a>
+        <a href="#"><i class="fas fa-book"></i> Settings</a>
+
     </div>
 
     <!-- Main Content -->

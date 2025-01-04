@@ -90,7 +90,7 @@
         <h4>Fare Details</h4>
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label for="room_charge" class="form-label">Room Charge Per Day</label>
+                <label for="room_charge" class="form-label">Room Charge Per Day (Tax Inclusive)</label>
                 <input type="number" class="form-control" id="room_charge" name="room_charge" readonly>
             </div>
             <div class="col-md-6 mb-3">
@@ -102,7 +102,11 @@
 
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label for="total_charge" class="form-label">Total Charge</label>
+                <label for="tax_amount" class="form-label">Tax Amount</label>
+                <input type="number" class="form-control" id="tax_amount" name="tax_amount" readonly>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="total_charge" class="form-label">Total Charge (Tax Inclusive)</label>
                 <input type="number" class="form-control" id="total_charge" name="total_charge" readonly>
             </div>
         </div>
@@ -110,51 +114,8 @@
         <button type="submit" class="btn btn-success">Create Booking</button>
     </form>
 </div>
-<div class="modal fade" id="newCustomerModal" tabindex="-1" aria-labelledby="newCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="newCustomerForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="newCustomerModalLabel">Add New Customer</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="f_name" class="form-label">First Name</label>
-                        <input type="text" class="form-control" name="f_name" id="f_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="l_name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" name="l_name" id="l_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" id="email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">Phone</label>
-                        <input type="text" class="form-control" name="phone" id="phone" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="gender" class="form-label">Gender</label>
-                        <select class="form-select" name="gender" id="gender" required>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success">Save Customer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
     flatpickr("#check_in", {
         dateFormat: "Y-m-d", // Customize date format as needed
         onChange: function(selectedDates, dateStr, instance) {
@@ -171,35 +132,91 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-</script>
+    </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const checkInField = document.getElementById('check_in');
-        const checkOutField = document.getElementById('check_out');
-        const daysField = document.getElementById('number_of_days');
-        const roomChargeField = document.getElementById('room_charge');
-        const totalChargeField = document.getElementById('total_charge');
-        const roomSelect = document.getElementById('room_ids');
+   document.addEventListener('DOMContentLoaded', function () {
+    const taxPercentage = @json($taxPercentage); // Fetch GST percentage from server
+    const checkInField = document.getElementById('check_in');
+    const checkOutField = document.getElementById('check_out');
+    const roomSelect = document.getElementById('room_ids');
+    const daysField = document.getElementById('number_of_days');
+    const roomChargeField = document.getElementById('room_charge');
+    const taxAmountField = document.getElementById('tax_amount');
+    const totalChargeField = document.getElementById('total_charge');
 
-        function calculateDaysAndTotal() {
-            const checkInDate = new Date(checkInField.value);
-            const checkOutDate = new Date(checkOutField.value);
+    /**
+     * Calculate GST and update fields.
+     */
+    function calculateGST() {
+        const checkInDate = new Date(checkInField.value);
+        const checkOutDate = new Date(checkOutField.value);
 
-            if (checkInDate && checkOutDate && checkOutDate > checkInDate) {
-                const days = (checkOutDate - checkInDate) / (1000 * 3600 * 24);
-                daysField.value = days;
+        if (isValidDateRange(checkInDate, checkOutDate)) {
+            const days = calculateDays(checkInDate, checkOutDate);
+            const roomChargeInclusive = calculateRoomChargeInclusive();
+            const roomChargeExclusive = calculateRoomChargeExclusive(roomChargeInclusive);
+            const taxAmount = roomChargeInclusive - roomChargeExclusive;
 
-                const roomCharge = Array.from(roomSelect.selectedOptions)
-                    .reduce((sum, option) => sum + parseFloat(option.dataset.basePrice || 0), 0);
-
-                roomChargeField.value = roomCharge.toFixed(2);
-                totalChargeField.value = (roomCharge * days).toFixed(2);
-            }
+            updateFields(days, roomChargeInclusive, taxAmount);
         }
+    }
 
-        checkInField.addEventListener('change', calculateDaysAndTotal);
-        checkOutField.addEventListener('change', calculateDaysAndTotal);
-        roomSelect.addEventListener('change', calculateDaysAndTotal);
-    });
+    /**
+     * Check if date range is valid.
+     * @param {Date} checkIn - Check-in date.
+     * @param {Date} checkOut - Check-out date.
+     * @returns {boolean} - True if valid, false otherwise.
+     */
+    function isValidDateRange(checkIn, checkOut) {
+        return checkIn && checkOut && checkOut > checkIn;
+    }
+
+    /**
+     * Calculate the number of days.
+     * @param {Date} checkIn - Check-in date.
+     * @param {Date} checkOut - Check-out date.
+     * @returns {number} - Total days.
+     */
+    function calculateDays(checkIn, checkOut) {
+        return (checkOut - checkIn) / (1000 * 3600 * 24);
+    }
+
+    /**
+     * Calculate the inclusive room charge.
+     * @returns {number} - Inclusive room charge.
+     */
+    function calculateRoomChargeInclusive() {
+        return Array.from(roomSelect.selectedOptions)
+            .reduce((sum, option) => sum + parseFloat(option.dataset.basePrice || 0), 0);
+    }
+
+    /**
+     * Calculate the exclusive room charge (without tax).
+     * @param {number} inclusiveCharge - Inclusive room charge.
+     * @returns {number} - Exclusive room charge.
+     */
+    function calculateRoomChargeExclusive(inclusiveCharge) {
+        return inclusiveCharge / (1 + taxPercentage / 100);
+    }
+
+    /**
+     * Update the form fields with calculated values.
+     * @param {number} days - Number of days.
+     * @param {number} inclusiveCharge - Inclusive room charge.
+     * @param {number} taxAmount - Tax amount.
+     */
+    function updateFields(days, inclusiveCharge, taxAmount) {
+        daysField.value = days;
+        roomChargeField.value = inclusiveCharge.toFixed(2);
+        taxAmountField.value = (taxAmount * days).toFixed(2);
+        totalChargeField.value = (inclusiveCharge * days).toFixed(2);
+    }
+
+    // Event listeners
+    checkInField.addEventListener('change', calculateGST);
+    checkOutField.addEventListener('change', calculateGST);
+    roomSelect.addEventListener('change', calculateGST);
+});
+
 </script>
 @endsection

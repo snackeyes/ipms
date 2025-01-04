@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Customer;
+use App\Models\Tax;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Reservation;
@@ -51,8 +52,10 @@ class BookingController extends Controller
                         });
                 })
                 ->get();
+                $gstTax = Tax::where('name', 'GST12')->first(); // Replace 'GST' with your actual tax name
+            $taxPercentage = $gstTax ? $gstTax->rate : 0; // Fallback to 0 if no tax found
 
-            return view('bookings.create', compact('reservation', 'customers', 'vacantRooms','roomTypes'));
+            return view('bookings.create', compact('reservation', 'customers', 'vacantRooms','roomTypes', 'taxPercentage'));
         } catch (\Exception $e) {
             \Log::error("Error displaying booking creation form: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return back()->withErrors('Unable to display the booking creation form at this time.');
