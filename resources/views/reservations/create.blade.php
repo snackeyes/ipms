@@ -92,10 +92,11 @@
     </form>
 </div>
 <!-- New Customer Modal -->
+<!-- New Customer Modal -->
 <div class="modal fade" id="newCustomerModal" tabindex="-1" aria-labelledby="newCustomerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="newCustomerForm">
+            <form id="newCustomerForm" onsubmit="addNewCustomer(event)">
                 <div class="modal-header">
                     <h5 class="modal-title" id="newCustomerModalLabel">Add New Customer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -121,6 +122,7 @@
                     <div class="mb-3">
                         <label for="gender" class="form-label">Gender</label>
                         <select class="form-select" name="gender" id="gender" required>
+                            <option value="">Select Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                             <option value="other">Other</option>
@@ -135,5 +137,35 @@
         </div>
     </div>
 </div>
+
+<script>
+// Handle form submission
+$('#newCustomerForm').on('submit', function (e) {
+    e.preventDefault();
+
+    var formData = new FormData(this);
+
+    $.ajax({
+        url: "{{ route('customers.store') }}",
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.status === 'success') {
+                // Close modal and reset form only if necessary
+                $('#newCustomerModal').modal('hide');
+                $('#customer_id').append(new Option(response.customer.f_name + ' ' + response.customer.l_name + ' - ' + response.customer.phone, response.customer.id)).trigger('change');
+                $('#newCustomerForm')[0].reset();  // Only reset if needed
+            } else {
+                alert('Error: ' + response.message);
+            }
+        },
+        error: function (response) {
+            alert('Something went wrong, please try again.');
+        }
+    });
+});
+</script>
 
 @endsection

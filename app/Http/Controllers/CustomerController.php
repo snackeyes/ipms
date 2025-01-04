@@ -38,7 +38,7 @@ class CustomerController extends Controller
         'id_back' => 'nullable|file|mimes:jpeg,png,jpg',
     ]);
 
-    $data = $request->all();
+    dd($data = $request->all());
 
     // Handle file uploads
     if ($request->hasFile('id_front')) {
