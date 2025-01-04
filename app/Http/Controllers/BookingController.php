@@ -66,7 +66,7 @@ class BookingController extends Controller
 
 
     public function store(Request $request)
-    {dd($request);
+    {//dd($request);
         \Log::info('Store method initiated.');
 
         try {
@@ -86,7 +86,8 @@ class BookingController extends Controller
             ]);
 
             \Log::info('Validation successful.');
-
+$ttl_amount=($request->room_charge*$request->number_of_days)-$request->advance_payment;
+//dd($ttl_amount);
             // Insert booking data into the `bookings` table
             $bookingData = [
                 'customer_id' => $request->customer_id,
@@ -95,7 +96,10 @@ class BookingController extends Controller
                 'meal_plan_id' => $request->meal_plan,
                 'advance_payment' => $request->advance_payment,
                 'agent_id' => $request->agent_name,
-                'total_amount'=>$request->total_charge,
+                'total_amount'=>$ttl_amount,
+                'remaining_balance'=>$request->total_charge,
+                'tax_amount'=>$request->tax_amount,
+                'payment_methods_id'=>$request->payment_method_id,
                 'status' => 'confirmed',
                 'created_at' => now(),
                 'updated_at' => now(),
