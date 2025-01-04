@@ -11,6 +11,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaxController;
+use App\Http\Controllers\PaymentMethodController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -48,6 +49,7 @@ Route::get('rooms/data/',function () {
 });
 Route::get('/rooms/status', [RoomController::class, 'getRoomStatus'])->name('rooms.status');
 Route::resource('taxes', TaxController::class);
+Route::resource('payment-methods', PaymentMethodController::class);
 
 
 require __DIR__.'/auth.php';

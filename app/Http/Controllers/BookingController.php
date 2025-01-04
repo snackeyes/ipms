@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Reservation;
 use App\Models\RoomType;
+use App\Models\PaymentMethod;
 use DB;
 
 class BookingController extends Controller
@@ -54,8 +55,9 @@ class BookingController extends Controller
                 ->get();
                 $gstTax = Tax::where('name', 'GST12')->first(); // Replace 'GST' with your actual tax name
             $taxPercentage = $gstTax ? $gstTax->rate : 0; // Fallback to 0 if no tax found
+            $paymentMethods = PaymentMethod::all();
 
-            return view('bookings.create', compact('reservation', 'customers', 'vacantRooms','roomTypes', 'taxPercentage'));
+            return view('bookings.create', compact('reservation', 'customers', 'vacantRooms','roomTypes', 'taxPercentage','paymentMethods'));
         } catch (\Exception $e) {
             \Log::error("Error displaying booking creation form: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return back()->withErrors('Unable to display the booking creation form at this time.');
@@ -64,7 +66,7 @@ class BookingController extends Controller
 
 
     public function store(Request $request)
-    {
+    {dd($request);
         \Log::info('Store method initiated.');
 
         try {
@@ -93,6 +95,7 @@ class BookingController extends Controller
                 'meal_plan_id' => $request->meal_plan,
                 'advance_payment' => $request->advance_payment,
                 'agent_id' => $request->agent_name,
+                'total_amount'=>$request->total_charge,
                 'status' => 'confirmed',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -145,8 +148,13 @@ class BookingController extends Controller
     public function edit($id)
     {
         try {
+            // Fetch the booking, including related rooms and customer data
             $booking = Booking::with(['rooms', 'customer'])->findOrFail($id);
+
+            // Fetch all customers for the customer dropdown
             $customers = Customer::all();
+
+            // Fetch the vacant rooms, excluding those already booked for the specified date range
             $vacantRooms = DB::table('rooms')
                 ->whereNotExists(function ($query) use ($booking) {
                     $query->select(DB::raw(1))
@@ -154,19 +162,22 @@ class BookingController extends Controller
                         ->join('booking_room', 'bookings.id', '=', 'booking_room.booking_id')
                         ->whereRaw('rooms.id = booking_room.room_id')
                         ->where(function ($query) use ($booking) {
+                            // Check for overlapping booking dates
                             $query->whereBetween('bookings.check_in_date', [$booking->check_in_date, $booking->check_out_date])
                                   ->orWhereBetween('bookings.check_out_date', [$booking->check_in_date, $booking->check_out_date]);
                         });
                 })
-                ->orWhereIn('id', $booking->rooms->pluck('id')) // Include already selected rooms
+                ->orWhereIn('id', $booking->rooms->pluck('id')) // Include already selected rooms in the edit view
                 ->get();
-//dd($booking);
-            return view('bookings.edit', compact('booking', 'customers', 'vacantRooms'));
+                $roomTypes = RoomType::all();
+            return view('bookings.edit', compact('booking', 'customers', 'vacantRooms','roomTypes'));
+
         } catch (\Exception $e) {
             \Log::error("Error fetching booking for edit: " . $e->getMessage());
             return redirect()->back()->with('error', 'Unable to fetch booking details for editing.');
         }
     }
+
 
     public function update(Request $request, $id)
 {

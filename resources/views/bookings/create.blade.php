@@ -74,8 +74,13 @@
         <!-- Meal Plan -->
         <div class="mb-3">
             <label for="meal_plan" class="form-label">Meal Plan</label>
-            <input type="text" class="form-control" name="meal_plan" id="meal_plan"
-                   value="{{ old('meal_plan', $reservation->meal_plan ?? '') }}" placeholder="e.g., Breakfast Only">
+            <select class="form-select" name="meal_plan" id="meal_plan">
+                <option value="">Select Meal Plan</option>
+                <option value="EP">EP</option>
+                <option value="CP">CP</option>
+                <option value="MAP">MAP</option>
+                <option value="AP">AP</option>
+            </select>
         </div>
 
         <!-- Agent Name -->
@@ -110,18 +115,32 @@
                 <input type="number" class="form-control" id="total_charge" name="total_charge" readonly>
             </div>
         </div>
+        <!-- Payment Method -->
+<div class="mb-3">
+    <label for="payment_method" class="form-label">Payment Method</label>
+    <select class="form-select" name="payment_method_id" id="payment_method" required>
+        <option value="">Select Payment Method</option>
+        @foreach($paymentMethods as $paymentMethod)
+            <option value="{{ $paymentMethod->id }}"
+                {{ old('payment_method_id', $reservation->payment_method_id ?? '') == $paymentMethod->id ? 'selected' : '' }}>
+                {{ $paymentMethod->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
 
         <button type="submit" class="btn btn-success">Create Booking</button>
     </form>
 </div>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     // DOM Elements
     const checkInField = document.getElementById('check_in');
     const checkOutField = document.getElementById('check_out');
     const roomSelect = document.getElementById('room_ids');
     const daysField = document.getElementById('number_of_days');
     const roomChargeField = document.getElementById('room_charge');
+    const advancePaymentField = document.getElementById('advance_payment');
     const taxAmountField = document.getElementById('tax_amount');
     const totalChargeField = document.getElementById('total_charge');
     const availableRoomsUrl = "{{ url('/rooms/available') }}"; // URL for fetching available rooms
@@ -184,6 +203,7 @@
     function calculateGST() {
         const checkInDate = new Date(checkInField.value);
         const checkOutDate = new Date(checkOutField.value);
+        const advancePayment = parseFloat(advancePaymentField.value || 0);
 
         if (isValidDateRange(checkInDate, checkOutDate)) {
             const days = calculateDays(checkInDate, checkOutDate);
@@ -191,7 +211,15 @@
             const taxAmount = roomCharges.taxAmount;
             const inclusiveCharge = roomCharges.inclusiveCharge;
 
+            // Subtract advance payment from total charge
+            const totalCharge = inclusiveCharge * days;
+            const finalTotalCharge = totalCharge - advancePayment;
+
             updateFields(days, inclusiveCharge, taxAmount);
+
+            // Update total charge field after deducting advance payment
+            totalChargeField.value = finalTotalCharge.toFixed(2);
+            log("Total charge after subtracting advance payment", finalTotalCharge);
         } else {
             clearFields(); // Clear fields if dates are invalid
         }
@@ -246,16 +274,7 @@
     checkInField.addEventListener('change', calculateGST);
     checkOutField.addEventListener('change', calculateGST);
     roomSelect.addEventListener('change', calculateGST);
-
-    roomChargeField.addEventListener('input', function () {
-        const newRoomCharge = parseFloat(roomChargeField.value || 0);
-        const gstRate = getGSTRate(newRoomCharge);
-        const exclusiveCharge = newRoomCharge / (1 + gstRate / 100);
-        const taxAmount = newRoomCharge - exclusiveCharge;
-        totalChargeField.value = (newRoomCharge * parseInt(daysField.value || 0)).toFixed(2);
-        taxAmountField.value = (taxAmount * parseInt(daysField.value || 0)).toFixed(2);
-        log("Updated room charge manually", { newRoomCharge, exclusiveCharge, taxAmount });
-    });
+    advancePaymentField.addEventListener('input', calculateGST); // Recalculate when advance payment changes
 
     // Initialize Flatpickr
     flatpickr("#check_in", {

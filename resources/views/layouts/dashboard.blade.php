@@ -123,6 +123,7 @@
         <a href="#"><i class="fas fa-book"></i> Check Out</a>
         <a href="#"><i class="fas fa-book"></i> Addtional Charges </a>
         <a href="#"><i class="fas fa-book"></i> Reports</a>
+        <a href="{{ route('payment-methods.index') }}"><i class="fas fa-book"></i> Payment Method</a>
         <a href="{{ route('taxes.index') }}"><i class="fas fa-book"></i> Tax Master</a>
         <a href="#"><i class="fas fa-book"></i> Settings</a>
 
