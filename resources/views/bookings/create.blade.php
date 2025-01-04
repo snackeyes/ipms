@@ -91,7 +91,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="room_charge" class="form-label">Room Charge Per Day (Tax Inclusive)</label>
-                <input type="number" class="form-control" id="room_charge" name="room_charge" readonly>
+                <input type="number" class="form-control" id="room_charge" name="room_charge">
             </div>
             <div class="col-md-6 mb-3">
                 <label for="advance_payment" class="form-label">Advance Payment</label>
@@ -115,27 +115,8 @@
     </form>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    flatpickr("#check_in", {
-        dateFormat: "Y-m-d", // Customize date format as needed
-        onChange: function(selectedDates, dateStr, instance) {
-            // Optional: Trigger calculation when date is selected
-            calculateDaysAndTotal();
-        }
-    });
-
-    flatpickr("#check_out", {
-        dateFormat: "Y-m-d", // Customize date format as needed
-        onChange: function(selectedDates, dateStr, instance) {
-            // Optional: Trigger calculation when date is selected
-            calculateDaysAndTotal();
-        }
-    });
-});
-    </script>
-<script>
-   document.addEventListener('DOMContentLoaded', function () {
-    const taxPercentage = @json($taxPercentage); // Fetch GST percentage from server
+  document.addEventListener('DOMContentLoaded', function () {
+    // DOM Elements
     const checkInField = document.getElementById('check_in');
     const checkOutField = document.getElementById('check_out');
     const roomSelect = document.getElementById('room_ids');
@@ -143,80 +124,214 @@
     const roomChargeField = document.getElementById('room_charge');
     const taxAmountField = document.getElementById('tax_amount');
     const totalChargeField = document.getElementById('total_charge');
+    const availableRoomsUrl = "{{ url('/rooms/available') }}"; // URL for fetching available rooms
 
-    /**
-     * Calculate GST and update fields.
-     */
+    // Helper functions
+    function log(message, data = null) {
+        console.log(message, data);
+    }
+
+    function getGSTRate(roomTariff) {
+        const gstRate = roomTariff < 7500 ? 12 : 18; // GST rates: 12% below ₹7500, 18% otherwise
+        log("GST rate determined", { roomTariff, gstRate });
+        return gstRate;
+    }
+
+    function isValidDateRange(checkIn, checkOut) {
+        const isValid = checkIn && checkOut && checkOut > checkIn;
+        log("Date range validation", { checkIn, checkOut, isValid });
+        return isValid;
+    }
+
+    function calculateDays(checkIn, checkOut) {
+        const days = Math.ceil((checkOut - checkIn) / (1000 * 3600 * 24));
+        log("Calculated days between dates", { checkIn, checkOut, days });
+        return days;
+    }
+
+    function calculateRoomCharges() {
+        let inclusiveCharge = 0;
+        let taxAmount = 0;
+
+        Array.from(roomSelect.selectedOptions).forEach(option => {
+            const roomTariff = parseFloat(option.dataset.basePrice || 0);
+            const gstRate = getGSTRate(roomTariff);
+            const exclusiveCharge = roomTariff / (1 + gstRate / 100);
+            inclusiveCharge += roomTariff;
+            taxAmount += (roomTariff - exclusiveCharge);
+        });
+
+        log("Room charges calculation", { inclusiveCharge, taxAmount });
+        return { inclusiveCharge, taxAmount };
+    }
+
+    function updateFields(days, inclusiveCharge, taxAmount) {
+        daysField.value = days;
+        roomChargeField.value = inclusiveCharge.toFixed(2);
+        taxAmountField.value = (taxAmount * days).toFixed(2);
+        totalChargeField.value = (inclusiveCharge * days).toFixed(2);
+        log("Updated fields with calculated values", { days, inclusiveCharge, taxAmount });
+    }
+
+    function clearFields() {
+        daysField.value = '';
+        roomChargeField.value = '';
+        taxAmountField.value = '';
+        totalChargeField.value = '';
+        log("Cleared fields");
+    }
+
     function calculateGST() {
         const checkInDate = new Date(checkInField.value);
         const checkOutDate = new Date(checkOutField.value);
 
         if (isValidDateRange(checkInDate, checkOutDate)) {
             const days = calculateDays(checkInDate, checkOutDate);
-            const roomChargeInclusive = calculateRoomChargeInclusive();
-            const roomChargeExclusive = calculateRoomChargeExclusive(roomChargeInclusive);
-            const taxAmount = roomChargeInclusive - roomChargeExclusive;
+            const roomCharges = calculateRoomCharges();
+            const taxAmount = roomCharges.taxAmount;
+            const inclusiveCharge = roomCharges.inclusiveCharge;
 
-            updateFields(days, roomChargeInclusive, taxAmount);
+            updateFields(days, inclusiveCharge, taxAmount);
+        } else {
+            clearFields(); // Clear fields if dates are invalid
         }
     }
 
-    /**
-     * Check if date range is valid.
-     * @param {Date} checkIn - Check-in date.
-     * @param {Date} checkOut - Check-out date.
-     * @returns {boolean} - True if valid, false otherwise.
-     */
-    function isValidDateRange(checkIn, checkOut) {
-        return checkIn && checkOut && checkOut > checkIn;
-    }
+    function fetchAvailableRooms() {
+        const checkIn = checkInField.value;
+        const checkOut = checkOutField.value;
 
-    /**
-     * Calculate the number of days.
-     * @param {Date} checkIn - Check-in date.
-     * @param {Date} checkOut - Check-out date.
-     * @returns {number} - Total days.
-     */
-    function calculateDays(checkIn, checkOut) {
-        return (checkOut - checkIn) / (1000 * 3600 * 24);
-    }
+        if (!checkIn || !checkOut) {
+            roomSelect.innerHTML = '<option value="">Select a room</option>';
+            log("Fetch rooms aborted", { checkIn, checkOut });
+            return;
+        }
 
-    /**
-     * Calculate the inclusive room charge.
-     * @returns {number} - Inclusive room charge.
-     */
-    function calculateRoomChargeInclusive() {
-        return Array.from(roomSelect.selectedOptions)
-            .reduce((sum, option) => sum + parseFloat(option.dataset.basePrice || 0), 0);
-    }
+        const url = `${availableRoomsUrl}?check_in=${encodeURIComponent(checkIn)}&check_out=${encodeURIComponent(checkOut)}`;
+        log("Fetching available rooms from URL", url);
 
-    /**
-     * Calculate the exclusive room charge (without tax).
-     * @param {number} inclusiveCharge - Inclusive room charge.
-     * @returns {number} - Exclusive room charge.
-     */
-    function calculateRoomChargeExclusive(inclusiveCharge) {
-        return inclusiveCharge / (1 + taxPercentage / 100);
-    }
+        fetch(url)
+            .then(response => {
+                log("Received response", response);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                log("Fetched available rooms data", data);
+                roomSelect.innerHTML = ''; // Clear previous options
 
-    /**
-     * Update the form fields with calculated values.
-     * @param {number} days - Number of days.
-     * @param {number} inclusiveCharge - Inclusive room charge.
-     * @param {number} taxAmount - Tax amount.
-     */
-    function updateFields(days, inclusiveCharge, taxAmount) {
-        daysField.value = days;
-        roomChargeField.value = inclusiveCharge.toFixed(2);
-        taxAmountField.value = (taxAmount * days).toFixed(2);
-        totalChargeField.value = (inclusiveCharge * days).toFixed(2);
+                if (data.length === 0) {
+                    roomSelect.innerHTML = '<option value="">No rooms available</option>';
+                    return;
+                }
+
+                data.forEach(room => {
+                    const option = document.createElement('option');
+                    option.value = room.id; // Room ID
+                    option.textContent = room.room_number; // Display room number
+                    option.setAttribute('data-room-type', room.room_type_id || ""); // Room type
+                    option.setAttribute('data-base-price', room.base_price || ""); // Base price
+                    roomSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                log('Error fetching available rooms', error);
+                roomSelect.innerHTML = '<option value="">Error fetching rooms</option>';
+            });
     }
 
     // Event listeners
     checkInField.addEventListener('change', calculateGST);
     checkOutField.addEventListener('change', calculateGST);
     roomSelect.addEventListener('change', calculateGST);
+
+    roomChargeField.addEventListener('input', function () {
+        const newRoomCharge = parseFloat(roomChargeField.value || 0);
+        const gstRate = getGSTRate(newRoomCharge);
+        const exclusiveCharge = newRoomCharge / (1 + gstRate / 100);
+        const taxAmount = newRoomCharge - exclusiveCharge;
+        totalChargeField.value = (newRoomCharge * parseInt(daysField.value || 0)).toFixed(2);
+        taxAmountField.value = (taxAmount * parseInt(daysField.value || 0)).toFixed(2);
+        log("Updated room charge manually", { newRoomCharge, exclusiveCharge, taxAmount });
+    });
+
+    // Initialize Flatpickr
+    flatpickr("#check_in", {
+        dateFormat: "Y-m-d",
+        onChange: calculateGST,
+    });
+
+    flatpickr("#check_out", {
+        dateFormat: "Y-m-d",
+        onChange: calculateGST,
+    });
 });
 
 </script>
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+    // DOM Elements
+    const checkInField = document.getElementById('check_in');
+    const checkOutField = document.getElementById('check_out');
+    const roomSelect = document.getElementById('room_ids');
+    const availableRoomsUrl = "{{ url('/rooms/available') }}"; // URL for fetching available rooms
+
+    /**
+     * Fetch available rooms based on check-in and check-out dates.
+     */
+    function fetchAvailableRooms() {
+        const checkIn = checkInField.value;
+        const checkOut = checkOutField.value;
+
+        if (!checkIn || !checkOut) {
+            roomSelect.innerHTML = '<option value="">Select a room</option>';
+            console.warn("Check-in or Check-out date is missing.");
+            return;
+        }
+
+        const url = `${availableRoomsUrl}?check_in=${encodeURIComponent(checkIn)}&check_out=${encodeURIComponent(checkOut)}`;
+        console.log("Fetching available rooms from URL:", url);
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Available rooms data:", data);
+                roomSelect.innerHTML = ''; // Clear previous options
+
+                if (data.length === 0) {
+                    roomSelect.innerHTML = '<option value="">No rooms available</option>';
+                    return;
+                }
+
+                data.forEach(room => {
+                    const option = document.createElement('option');
+                    option.value = room.id; // Room ID
+                    option.textContent = room.room_number; // Display room number
+                    option.setAttribute('data-room-type', room.room_type_id || ""); // Room type
+                    option.setAttribute('data-base-price', room.base_price || ""); // Base price
+
+                    roomSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching available rooms:', error);
+                roomSelect.innerHTML = '<option value="">Error fetching rooms</option>';
+            });
+    }
+
+    /**
+     * Attach event listeners to fields.
+     */
+    checkInField.addEventListener('change', fetchAvailableRooms);
+    checkOutField.addEventListener('change', fetchAvailableRooms);
+});
+
+    </script>
 @endsection

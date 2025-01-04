@@ -73,15 +73,17 @@ class RoomController extends Controller
     $checkOut = $request->query('check_out');
 
     $vacantRooms = DB::table('rooms')
-        ->whereNotExists(function ($query) use ($checkIn, $checkOut) {
-            $query->select(DB::raw(1))
-                ->from('bookings')
-                ->join('booking_room', 'bookings.id', '=', 'booking_room.booking_id')
-                ->whereRaw('rooms.id = booking_room.room_id')
-                ->where('bookings.check_in_date', '<', $checkOut)
-                ->where('bookings.check_out_date', '>', $checkIn);
-        })
-        ->get();
+    ->leftJoin('room_types', 'rooms.room_type_id', '=', 'room_types.id') // Join with room_types table
+    ->select('rooms.id', 'rooms.room_number', 'room_types.name as room_type_name', 'rooms.base_price') // Fetch room type name
+    ->whereNotExists(function ($query) use ($checkIn, $checkOut) {
+        $query->select(DB::raw(1))
+            ->from('bookings')
+            ->join('booking_room', 'bookings.id', '=', 'booking_room.booking_id')
+            ->whereRaw('rooms.id = booking_room.room_id')
+            ->where('bookings.check_in_date', '<', $checkOut)
+            ->where('bookings.check_out_date', '>', $checkIn);
+    })
+    ->get();
 
     return response()->json($vacantRooms);
 }
