@@ -132,6 +132,143 @@
         <button type="submit" class="btn btn-success">Create Booking</button>
     </form>
 </div>
+<!-- Add New Customer Modal -->
+<div class="modal fade" id="newCustomerModal" tabindex="-1" aria-labelledby="newCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="newCustomerForm" method="POST" action="{{ route('customers.store') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newCustomerModalLabel">Add New Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- First Name -->
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="f_name" name="f_name" required>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="l_name" name="l_name" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Email -->
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="phone" name="phone" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Address -->
+                        <div class="col-md-12 mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="address" name="address">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- City -->
+                        <div class="col-md-4 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city">
+                        </div>
+
+                        <!-- State -->
+                        <div class="col-md-4 mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" class="form-control" id="state" name="state">
+                        </div>
+
+                        <!-- Country -->
+                        <div class="col-md-4 mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="country" name="country">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Gender -->
+                        <div class="col-md-6 mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div class="col-md-6 mb-3">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dob" name="dob">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Nationality -->
+                        <div class="col-md-6 mb-3">
+                            <label for="nationality" class="form-label">Nationality</label>
+                            <input type="text" class="form-control" id="nationality" name="nationality">
+                        </div>
+
+                        <!-- Identity Type -->
+                        <div class="col-md-6 mb-3">
+                            <label for="identity_type" class="form-label">Identity Type</label>
+                            <select class="form-select" id="identity_type" name="identity_type">
+                                <option value="">Select Identity Type</option>
+                                <option value="Passport">Passport</option>
+                                <option value="Driver's License">Driver's License</option>
+                                <option value="National ID">National ID</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Identity Number -->
+                        <div class="col-md-6 mb-3">
+                            <label for="identity_number" class="form-label">Identity Number</label>
+                            <input type="text" class="form-control" id="identity_number" name="identity_number">
+                        </div>
+
+                        <!-- Identity Front Image -->
+                        <div class="col-md-6 mb-3">
+                            <label for="identity_front" class="form-label">Identity Front Image</label>
+                            <input type="file" class="form-control" id="identity_front" name="identity_front">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Identity Back Image -->
+                        <div class="col-md-6 mb-3">
+                            <label for="identity_back" class="form-label">Identity Back Image</label>
+                            <input type="file" class="form-control" id="identity_back" name="identity_back">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // DOM Elements
@@ -351,6 +488,50 @@ document.addEventListener('DOMContentLoaded', function () {
     checkInField.addEventListener('change', fetchAvailableRooms);
     checkOutField.addEventListener('change', fetchAvailableRooms);
 });
+
+    </script>
+    <script>
+      document.getElementById("newCustomerForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch("{{ route('customers.store') }}", {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+            "X-Requested-With": "XMLHttpRequest",
+        },
+        body: formData,
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.status === "success") {
+                // Hide the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById("customerModal"));
+                modal.hide();
+
+                // Add the new customer to the dropdown
+                const customerDropdown = document.getElementById("customer_id");
+                const newOption = new Option(data.customer.f_name + " " + data.customer.l_name, data.customer.id, true, true);
+                customerDropdown.add(newOption);
+
+                // Clear the form fields
+                form.reset();
+
+                // Show success message
+                alert("Customer created and selected successfully!");
+            } else {
+                alert("Something went wrong. Please try again.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while processing your request.");
+        });
+});
+
 
     </script>
 @endsection

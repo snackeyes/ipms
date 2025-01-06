@@ -20,6 +20,7 @@ class CustomerController extends Controller
 
     public function store(Request $request)
 {
+    //Log::info('Request received', $request->all());
     $request->validate([
         'f_name' => 'required|string|max:255',
         'l_name' => 'required|string|max:255',
@@ -38,7 +39,7 @@ class CustomerController extends Controller
         'id_back' => 'nullable|file|mimes:jpeg,png,jpg',
     ]);
 
-    dd($data = $request->all());
+    $data = $request->all();
 
     // Handle file uploads
     if ($request->hasFile('id_front')) {
@@ -49,7 +50,7 @@ class CustomerController extends Controller
     }
 
     $customer = Customer::create($data);
-
+        
     // Check if the request is an AJAX request
     if ($request->ajax()) {
         return response()->json([
