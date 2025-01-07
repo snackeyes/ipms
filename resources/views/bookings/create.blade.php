@@ -505,12 +505,20 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         body: formData,
     })
-        .then((response) => response.json())
+        .then((response) => {
+            if (!response.ok) {
+                return response.json().then((error) => {
+                    throw error; // Pass validation errors to catch block
+                });
+            }
+            return response.json();
+        })
         .then((data) => {
             if (data.status === "success") {
                 // Hide the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById("customerModal"));
-                modal.hide();
+                const modalElement = document.getElementById("newCustomerModal");
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                modalInstance.hide();
 
                 // Add the new customer to the dropdown
                 const customerDropdown = document.getElementById("customer_id");
@@ -522,13 +530,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Show success message
                 alert("Customer created and selected successfully!");
-            } else {
-                alert("Something went wrong. Please try again.");
             }
         })
         .catch((error) => {
-            console.error("Error:", error);
-            alert("An error occurred while processing your request.");
+            // Display validation errors
+            if (error.errors) {
+                let errorMessages = "";
+                for (const [field, messages] of Object.entries(error.errors)) {
+                    errorMessages += `${field}: ${messages.join(", ")}\n`;
+                }
+                alert("Validation Errors:\n" + errorMessages);
+            } else {
+                console.error("Error:", error);
+                alert("An error occurred while processing your request.");
+            }
         });
 });
 
