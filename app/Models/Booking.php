@@ -26,4 +26,8 @@ public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
+    public function checkIns()
+{
+    return $this->hasMany(CheckIn::class);
+}
 }

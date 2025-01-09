@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\CheckIn;
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CheckInController extends Controller
 {
@@ -20,33 +21,39 @@ class CheckInController extends Controller
     return view('check_ins.index', compact('checkIns'));
     }
 
-    public function create()
-    {
-        $bookings = Booking::with(['customer', 'rooms'])->where('status', 'confirmed')->get();
-        return view('check_ins.create', compact('bookings'));
-    }
+   public function create()
+{
+    // Fetch bookings that are not checked in
+    $bookings = Booking::whereDoesntHave('checkIns', function ($query) {
+        $query->where('status', 'Checked In');
+    })->with('rooms', 'customer')->get();
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'check_in_date' => 'required|date',
-        ]);
+    return view('check_ins.create', compact('bookings'));
+}
+   public function store(Request $request)
+{
+    $request->validate([
+        'booking_id' => 'required|exists:bookings,id',
+        'check_in_date' => 'required|date',
+    ]);
 
-        $booking = Booking::with('rooms')->findOrFail($request->booking_id);
+    // Fetch the booking details
+    $booking = Booking::with('rooms')->findOrFail($request->booking_id);
 
-        // Create or update check-in record
-        CheckIn::updateOrCreate(
-            ['booking_id' => $booking->id],
-            [
-                'check_in_date' => $request->check_in_date,
-                'room_ids' => $booking->rooms->pluck('id')->toArray(), // Store room IDs as JSON
-                'status' => 'Checked In',
-            ]
-        );
+    // Retrieve the associated room IDs
+    $roomIds = $booking->rooms->pluck('id')->toArray();
 
-        return redirect()->route('check_ins.index')->with('success', 'Check-in completed for the booking!');
-    }
+    // Create the check-in
+    $checkIn = CheckIn::create([
+        'booking_id' => $request->booking_id,
+        'check_in_date' => $request->check_in_date,
+        'room_ids' => $roomIds, // Store room IDs as JSON
+        'status' => 'Checked In',
+    ]);
+
+    return redirect()->route('check_ins.index')->with('success', 'Check-in created successfully.');
+}
+
 
     public function destroy(CheckIn $checkIn)
     {

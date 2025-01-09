@@ -40,10 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class);
      Route::resource('bookings', BookingController::class);
       Route::resource('reservations', ReservationController::class);
-
-
-});
- Route::get('/customers/search', [CustomerController::class, 'search'])->name('customers.search');
+       Route::get('/customers/search', [CustomerController::class, 'search'])->name('customers.search');
 Route::get('/rooms/available', [RoomController::class, 'getAvailableRooms'])->name('rooms.available');
 Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
 Route::get('rooms/data/',function () {
@@ -54,5 +51,9 @@ Route::resource('taxes', TaxController::class);
 Route::resource('payment-methods', PaymentMethodController::class);
 Route::resource('additional_charges', AdditionalChargeController::class);
 Route::resource('check_ins', CheckInController::class);
+
+
+});
+
 
 require __DIR__.'/auth.php';

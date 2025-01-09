@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="container">
-    <h1>Check-In Records</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Check-In Records</h1>
+        <a href="{{ route('check_ins.create') }}" class="btn btn-primary">Check In</a>
+    </div>
     <table class="table table-bordered">
         <thead>
             <tr>
