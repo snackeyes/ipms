@@ -121,7 +121,7 @@
         <a href="{{ route('reservations.index') }}"><i class="fas fa-calendar-check"></i> Reservations</a>
         <a href="{{ route('bookings.index') }}"><i class="fas fa-book"></i> Bookings</a>
         <a href="{{route('check_ins.index')}}"><i class="fas fa-book"></i> Check In</a>
-        <a href="#"><i class="fas fa-book"></i> Check Out</a>
+        <a href="{{route('check_outs.index')}}"><i class="fas fa-book"></i> Check Out</a>
         <a href="{{route('additional_charges.index')}}"><i class="fas fa-book"></i> Addtional Charges </a>
         <a href="#"><i class="fas fa-book"></i> Reports</a>
         <a href="{{ route('payment-methods.index') }}"><i class="fas fa-book"></i> Payment Method</a>

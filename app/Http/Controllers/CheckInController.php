@@ -21,15 +21,19 @@ class CheckInController extends Controller
     return view('check_ins.index', compact('checkIns'));
     }
 
-   public function create()
+  public function create()
 {
-    // Fetch bookings that are not checked in
     $bookings = Booking::whereDoesntHave('checkIns', function ($query) {
         $query->where('status', 'Checked In');
     })->with('rooms', 'customer')->get();
 
-    return view('check_ins.create', compact('bookings'));
+    $checkedInBookings = Booking::whereHas('checkIns', function ($query) {
+        $query->where('status', 'Checked In');
+    })->with('rooms', 'customer', 'checkIns')->get();
+
+    return view('check_ins.create', compact('bookings', 'checkedInBookings'));
 }
+
    public function store(Request $request)
 {
     $request->validate([

@@ -14,6 +14,7 @@ use App\Http\Controllers\TaxController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\AdditionalChargeController;
 use App\Http\Controllers\CheckInController;
+use App\Http\Controllers\CheckOutController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -51,6 +52,9 @@ Route::resource('taxes', TaxController::class);
 Route::resource('payment-methods', PaymentMethodController::class);
 Route::resource('additional_charges', AdditionalChargeController::class);
 Route::resource('check_ins', CheckInController::class);
+Route::resource('check_outs', CheckOutController::class);
+Route::get('/check_outs/create/{checkIn}', [CheckOutController::class, 'create'])->name('check_outs.create');
+Route::post('/check_outs/store/{checkIn}', [CheckOutController::class, 'store'])->name('check_outs.store');
 
 
 });

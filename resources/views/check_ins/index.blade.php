@@ -9,30 +9,30 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>#</th>
+                <th>ID</th>
                 <th>Booking ID</th>
-                <th>Customer Name</th>
+                <th>Customer</th>
                 <th>Rooms</th>
                 <th>Check-In Date</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
             @foreach($checkIns as $checkIn)
             <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $checkIn->booking_id }}</td>
+                <td>{{ $checkIn->id }}</td>
+                <td>{{ $checkIn->booking->id }}</td>
                 <td>{{ $checkIn->booking->customer->fullName() }}</td>
-                <td>{{ implode(', ', $checkIn->room_numbers) }}</td>
+                <td>{{ $checkIn->booking->rooms->pluck('room_number')->join(', ') }}</td>
                 <td>{{ $checkIn->check_in_date }}</td>
                 <td>{{ $checkIn->status }}</td>
                 <td>
-                    <form action="{{ route('check_ins.destroy', $checkIn->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+                    @if($checkIn->status === 'Checked In')
+                        <a href="{{ route('check_outs.create', $checkIn->id) }}" class="btn btn-primary">Check Out</a>
+                    @else
+                        <span class="text-muted">Already Checked Out</span>
+                    @endif
                 </td>
             </tr>
             @endforeach
