@@ -6,30 +6,20 @@
     <form action="{{ route('check_outs.store', $checkIn->id) }}" method="POST">
         @csrf
 
-        <div class="mb-3">
-            <label for="customer_name" class="form-label">Customer</label>
-            <input type="text" id="customer_name" class="form-control" value="{{ $checkIn->booking->customer->name }}" disabled>
-        </div>
+        <h3>Booking Details</h3>
+        <p>Customer: {{ $checkIn->booking->customer->name }}</p>
+        <p>Rooms: {{ $checkIn->booking->rooms->pluck('room_number')->join(', ') }}</p>
 
-        <div class="mb-3">
-            <label for="rooms" class="form-label">Rooms</label>
-            <input type="text" id="rooms" class="form-control" value="{{ $checkIn->booking->rooms->pluck('room_number')->join(', ') }}" disabled>
-        </div>
-
-        <div class="mb-3">
-            <label for="additional_charges" class="form-label">Additional Charges</label>
-            <input type="number" name="additional_charges" id="additional_charges" class="form-control" step="0.01">
-        </div>
-
-        <div class="mb-3">
-            <label for="discount" class="form-label">Discount</label>
-            <input type="number" name="discount" id="discount" class="form-control" step="0.01">
-        </div>
-
-        <div class="mb-3">
-            <label for="rest_payment" class="form-label">Total Payment Due</label>
-            <input type="number" name="rest_payment" id="rest_payment" class="form-control" step="0.01" value="{{ $checkIn->booking->total_tariff }}" readonly>
-        </div>
+        <h3>Additional Charges</h3>
+        @foreach ($additionalCharges as $charge)
+            <div class="mb-3">
+                <label>
+                    <input type="checkbox" name="additional_charges[{{ $charge->id }}][id]" value="{{ $charge->id }}">
+                    {{ $charge->name }} (Default: {{ number_format($charge->default_amount, 2) }})
+                </label>
+                <input type="number" name="additional_charges[{{ $charge->id }}][amount]" class="form-control" placeholder="Enter amount" step="0.01">
+            </div>
+        @endforeach
 
         <button type="submit" class="btn btn-primary">Complete Check-Out</button>
     </form>

@@ -20,6 +20,12 @@ class CheckIn extends Model
 {
     return $this->hasMany(Room::class, 'id', 'room_ids');
 }
+public function additionalCharges()
+{
+    return $this->belongsToMany(AdditionalCharge::class, 'check_in_additional_charges')
+                ->withPivot('amount')
+                ->withTimestamps();
+}
     protected $casts = [
         'room_ids' => 'array', // Automatically convert JSON to array
     ];

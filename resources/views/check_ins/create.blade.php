@@ -26,33 +26,5 @@
 
         <button type="submit" class="btn btn-success">Check In</button>
     </form>
-
-    <hr>
-
-    <h2>Ready for Check-Out</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Booking ID</th>
-                <th>Customer</th>
-                <th>Rooms</th>
-                <th>Check-In Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($checkedInBookings as $checkedIn)
-            <tr>
-                <td>{{ $checkedIn->id }}</td>
-                <td>{{ $checkedIn->customer->name }}</td>
-                <td>{{ $checkedIn->rooms->pluck('room_number')->join(', ') }}</td>
-                <td>{{ $checkedIn->checkIns->first()->check_in_date }}</td>
-                <td>
-                    <a href="{{ route('check_outs.create', $checkedIn->id) }}" class="btn btn-primary">Check Out</a>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
 </div>
 @endsection

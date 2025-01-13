@@ -16,18 +16,20 @@ class CheckOutController extends Controller
     return view('check_outs.index', compact('checkOuts'));
 }
 
-  public function create($checkInId)
+ public function create($checkInId)
 {
-    Log::info("CheckIn ID: $checkInId");
+    // Fetch the check-in details along with booking, rooms, and additional charges
+    $checkIn = CheckIn::with('booking.customer', 'booking.rooms', 'additionalCharges')
+        ->findOrFail($checkInId);
 
-    $checkIn = CheckIn::with('booking', 'booking.rooms', 'booking.customer')->find($checkInId);
-//dd($checkIn);
-    if (!$checkIn) {
-        dd("CheckIn with ID $checkInId not found.");
-    }
+    $rooms = $checkIn->booking->rooms; // Associated rooms
+    $customer = $checkIn->booking->customer; // Customer details
+    $advancePayment = $checkIn->booking->advance_payment; // Advance payment
+    $additionalCharges = $checkIn->additionalCharges; // Fetched additional charges
 
-    return view('check_outs.create', compact('checkIn'));
+    return view('check_outs.create', compact('checkIn', 'rooms', 'customer', 'advancePayment', 'additionalCharges'));
 }
+
     public function store(Request $request, $checkInId)
     {
         $request->validate([
