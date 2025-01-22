@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Reservation;
 use App\Models\RoomType;
 use App\Models\PaymentMethod;
+use App\Models\AdditionalCharge;
 use DB;
 
 class BookingController extends Controller
@@ -18,7 +19,8 @@ class BookingController extends Controller
     public function index()
     {
         try {
-            $bookings = Booking::with(['rooms', 'customer'])->latest()->get();
+            $bookings = Booking::with(['customer', 'rooms', 'checkIns'])->get();
+            //dd($bookings);
             return view('bookings.index', compact('bookings'));
         } catch (\Exception $e) {
             Log::error("Error fetching bookings: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -96,6 +98,7 @@ $ttl_amount=($request->room_charge*$request->number_of_days)-$request->advance_p
                 'meal_plan_id' => $request->meal_plan,
                 'advance_payment' => $request->advance_payment,
                 'agent_id' => $request->agent_name,
+                'room_tariff'=>$request->room_charge,
                 'total_amount'=>$ttl_amount,
                 'remaining_balance'=>$request->total_charge,
                 'tax_amount'=>$request->tax_amount,
@@ -239,4 +242,38 @@ $ttl_amount=($request->room_charge*$request->number_of_days)-$request->advance_p
             return back()->withErrors('Unable to delete the booking at this time.');
         }
     }
+   
+    public function addChargesToBooking(Request $request, $bookingId)
+{
+    $booking = Booking::findOrFail($bookingId);
+
+    $validatedData = $request->validate([
+        'charges' => 'array|required',
+        'charges.*.id' => 'required|exists:additional_charges,id',
+        'charges.*.amount' => 'required|numeric|min:0',
+    ]);
+
+    foreach ($validatedData['charges'] as $charge) {
+        $booking->additionalCharges()->attach($charge['id'], ['amount' => $charge['amount']]);
+    }
+
+    return redirect()->back()->with('success', 'Charges added successfully!');
+}
+
+public function removeChargeFromBooking($bookingId, $chargeId)
+{
+    $booking = Booking::findOrFail($bookingId);
+    $booking->additionalCharges()->detach($chargeId);
+
+    return redirect()->back()->with('success', 'Charge removed successfully!');
+}
+
+public function showCharges($bookingId)
+{
+    $booking = Booking::with('additionalCharges')->findOrFail($bookingId);
+    $allCharges = AdditionalCharge::all(); // Fetch all available charges
+
+    return view('bookings.add_charges', compact('booking', 'allCharges'));
+}
+
 }

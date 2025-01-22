@@ -30,4 +30,10 @@ public function customer()
 {
     return $this->hasMany(CheckIn::class);
 }
+public function additionalCharges()
+{
+    return $this->belongsToMany(AdditionalCharge::class, 'additional_charge_booking')
+                ->withPivot('amount')
+                ->withTimestamps();
+}
 }

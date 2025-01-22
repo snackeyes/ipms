@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 09, 2025 at 09:15 AM
+-- Generation Time: Jan 22, 2025 at 12:52 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,6 +44,30 @@ INSERT INTO `additional_charges` (`id`, `name`, `description`, `amount`, `create
 (1, 'Mineral Water', NULL, 20.00, '2025-01-05 01:43:34', '2025-01-05 01:43:34'),
 (2, 'Tea', NULL, 50.00, '2025-01-05 01:44:05', '2025-01-05 01:44:05'),
 (3, 'Coffee', NULL, 70.00, '2025-01-05 01:44:17', '2025-01-05 01:44:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `additional_charge_booking`
+--
+
+CREATE TABLE `additional_charge_booking` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `booking_id` bigint(20) UNSIGNED NOT NULL,
+  `additional_charge_id` bigint(20) UNSIGNED NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `additional_charge_booking`
+--
+
+INSERT INTO `additional_charge_booking` (`id`, `booking_id`, `additional_charge_id`, `amount`, `created_at`, `updated_at`) VALUES
+(1, 11, 1, 20.00, '2025-01-14 07:06:50', '2025-01-14 07:06:50'),
+(2, 11, 2, 30.00, '2025-01-14 07:06:50', '2025-01-14 07:06:50'),
+(5, 10, 1, 50.00, '2025-01-18 06:05:50', '2025-01-18 06:05:50');
 
 -- --------------------------------------------------------
 
@@ -97,8 +121,10 @@ INSERT INTO `bookings` (`id`, `reservation_id`, `customer_id`, `room_id`, `agent
 (7, NULL, 3, NULL, 'bnm', 'half_board', NULL, NULL, NULL, 2000.00, '2025-01-03', '2025-01-04', 'confirmed', NULL, NULL, '2025-01-02 08:05:21', '2025-01-02 08:05:21', '', ''),
 (8, NULL, 4, NULL, NULL, 'MAP', NULL, NULL, NULL, NULL, '2025-01-04', '2025-01-06', 'confirmed', NULL, NULL, '2025-01-04 04:39:39', '2025-01-04 04:39:39', '', ''),
 (9, NULL, 3, NULL, 'bnm', 'EP', NULL, NULL, NULL, 2000.00, '2025-01-03', '2025-01-04', 'confirmed', 1000.00, NULL, '2025-01-04 06:12:51', '2025-01-04 06:12:51', '', ''),
-(10, NULL, 3, NULL, 'bn', 'AP', NULL, NULL, NULL, 200.00, '2025-01-10', '2025-01-21', 'confirmed', 43800.00, 43800.00, '2025-01-04 07:16:14', '2025-01-04 07:16:14', '4714.29', '1'),
-(11, NULL, 10, NULL, 'BNM', 'MAP', NULL, NULL, NULL, 2000.00, '2025-01-06', '2025-01-07', 'confirmed', 6000.00, 6000.00, '2025-01-06 01:09:56', '2025-01-06 01:09:56', '1220.34', '2');
+(10, NULL, 3, NULL, 'bn', 'AP', NULL, NULL, 2000.00, 2000.00, '2025-01-10', '2025-01-21', 'confirmed', 43800.00, 43800.00, '2025-01-04 07:16:14', '2025-01-04 07:16:14', '4714.29', '1'),
+(11, NULL, 10, NULL, 'BNM', 'MAP', NULL, NULL, NULL, 2000.00, '2025-01-06', '2025-01-07', 'confirmed', 6000.00, 6000.00, '2025-01-06 01:09:56', '2025-01-06 01:09:56', '1220.34', '2'),
+(12, NULL, 5, NULL, 'aaaa', 'EP', NULL, NULL, NULL, 2000.00, '2025-01-25', '2025-01-31', 'confirmed', 46000.00, 46000.00, '2025-01-14 12:18:53', '2025-01-14 12:18:53', '7322.03', '1'),
+(13, NULL, 7, NULL, 'bnm', 'EP', NULL, NULL, 3000.00, 2000.00, '2025-01-17', '2025-01-24', 'confirmed', 19000.00, 19000.00, '2025-01-14 12:29:57', '2025-01-14 12:29:57', '2250.00', '1');
 
 -- --------------------------------------------------------
 
@@ -127,7 +153,9 @@ INSERT INTO `booking_room` (`id`, `booking_id`, `room_id`, `check_in_date`, `che
 (10, 10, 3, '2025-01-10', '2025-01-21', '2025-01-04 07:16:14', '2025-01-05 03:00:19'),
 (11, 10, 1, '2025-01-10', '2025-01-21', '2025-01-05 03:00:19', '2025-01-05 03:00:19'),
 (12, 10, 2, '2025-01-10', '2025-01-21', '2025-01-05 03:00:19', '2025-01-05 03:00:19'),
-(13, 11, 1, '2025-01-06', '2025-01-07', '2025-01-06 01:09:56', '2025-01-06 01:09:56');
+(13, 11, 1, '2025-01-06', '2025-01-07', '2025-01-06 01:09:56', '2025-01-06 01:09:56'),
+(14, 12, 1, '2025-01-25', '2025-01-31', '2025-01-14 12:18:53', '2025-01-14 12:18:53'),
+(15, 13, 4, '2025-01-17', '2025-01-24', '2025-01-14 12:29:57', '2025-01-14 12:29:57');
 
 -- --------------------------------------------------------
 
@@ -147,7 +175,9 @@ CREATE TABLE `cache` (
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
 ('vahid.snackeye@gmail.com|::1', 'i:1;', 1735383997),
-('vahid.snackeye@gmail.com|::1:timer', 'i:1735383997;', 1735383997);
+('vahid.snackeye@gmail.com|::1:timer', 'i:1735383997;', 1735383997),
+('vahidsnackeyes@gmail.com|::1', 'i:1;', 1736507344),
+('vahidsnackeyes@gmail.com|::1:timer', 'i:1736507344;', 1736507344);
 
 -- --------------------------------------------------------
 
@@ -183,7 +213,44 @@ CREATE TABLE `check_ins` (
 --
 
 INSERT INTO `check_ins` (`id`, `booking_id`, `room_ids`, `room_id`, `check_in_date`, `status`, `created_at`, `updated_at`) VALUES
-(5, 10, '[3,1,2]', NULL, '2025-01-09', 'Checked In', '2025-01-09 02:27:52', '2025-01-09 02:27:52');
+(6, 10, '[3,1,2]', NULL, '2025-01-10', 'Checked In', '2025-01-10 00:44:07', '2025-01-18 05:36:44'),
+(7, 11, '[1]', NULL, '2025-01-11', 'Checked In', '2025-01-10 23:52:45', '2025-01-10 23:52:45'),
+(8, 13, '[4]', NULL, '2025-01-14', 'Checked In', '2025-01-14 12:30:16', '2025-01-14 12:30:16');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `check_in_additional_charges`
+--
+
+CREATE TABLE `check_in_additional_charges` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `check_in_id` bigint(20) UNSIGNED NOT NULL,
+  `additional_charge_id` bigint(20) UNSIGNED NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `check_outs`
+--
+
+CREATE TABLE `check_outs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `check_in_id` bigint(20) UNSIGNED NOT NULL,
+  `rest_payment` decimal(10,2) NOT NULL,
+  `payment_status` varchar(255) NOT NULL DEFAULT 'Pending',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `additional_charges` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`additional_charges`)),
+  `discount` decimal(8,2) DEFAULT NULL,
+  `discount_remarks` varchar(255) DEFAULT NULL,
+  `gst` decimal(8,2) DEFAULT NULL,
+  `final_amount` decimal(10,2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -344,7 +411,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (31, '2025_01_04_121854_add_fields_in_booking_table', 17),
 (32, '2025_01_05_052756_create_additional_charges_table', 18),
 (34, '2025_01_05_071855_create_check_ins_table', 19),
-(35, '2025_01_05_112847_add_room_ids_to_check_ins_table', 20);
+(35, '2025_01_05_112847_add_room_ids_to_check_ins_table', 20),
+(36, '2025_01_10_054005_create_check_outs_table', 21),
+(37, '2025_01_11_071050_add_fields_to_check_outs_table', 22),
+(38, '2025_01_11_152026_create_additional_charges_table', 23),
+(39, '2025_01_14_120522_create_additional_charge_booking_table', 24);
 
 -- --------------------------------------------------------
 
@@ -577,10 +648,13 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('57NSLKyPMddjX87Am5FBiOOSQdFLvNJEdy6QWsD7', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoicVpla2VuSGJZT09NM1NYY0FtbEMxMVhkS1R1RDJqdmdFejhUZW1rWCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMvY2hlY2tfaW5zIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czozOiJ1cmwiO2E6MDp7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1736236475),
-('9DgYxZKpbhC3bvUOoSg9LGp1AM3wKXIdfqhWRaR8', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiZEp1S2cya25zdGtwc0F2OUFmdmhTQmdsQVh5aGlVSDI0MFZTSW51bCI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjQ1OiJodHRwOi8vbG9jYWxob3N0L2lwbXMvcHVibGljL2NoZWNrX2lucy9jcmVhdGUiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1736257571),
-('F9qPOdA3nqjEyEJtgI388FlLVRGdoWOmSaOeUPtj', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiQ20xTENVU0N3am5VWDIzUENsSkdRbGFIdU96MnZpY3FTR1hMem1NayI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMvcm9vbXMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1736410246),
-('zicCrFOLgI2ItCJPO3bDitM59oZHSDhBWk9EwJHC', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoibGJWOTZCbjE3cUY4M2pFS0xZYk91WkJsMFJRRUVWQU4wckRBYXZlSSI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjg1OiJodHRwOi8vbG9jYWxob3N0L2lwbXMvcHVibGljL3Jvb21zL2F2YWlsYWJsZT9jaGVja19pbj0yMDI1LTAxLTA4JmNoZWNrX291dD0yMDI1LTAxLTA5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1736313708);
+('2Av2HlYH8vKLFTJcCiNxWzVw5v59YfmFrUlaiTvH', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiSDNpZDVzVUtIOUJKTnhKU2p2bTJYazhYN1VWdnpwR3RoYUlNM1ZiNSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDg6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMvY2hlY2tfb3V0cy9jcmVhdGUvNiI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1737038288),
+('7bSj0ywQjFpqvAHv1sgO2DSRotdVXXIg0XjTISGI', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiRjZNQzY3aThMQVpEa21ZOEdrU1doaElPQlYzNmNKTXZTWHlPd3h1TSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMvZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1737467264),
+('dl2K1XnSg5bbnJtHOJi35LEpIml92QsFKIRpqA2V', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoid1RyZFBUNHNJSlQxVkpYTkU0MXdtWUFWOFA5OXRDVE5WdFpKb0V2eiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjg6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1737351103),
+('FQh4zB51lEY0ToH01AkMPoUr8OdQxTfcQVGaMXku', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUkpEWUZiMzN5dU1ibDBqNjV4Vkw3U2J4czByc05HTjFqSTRKSDlnVSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMvbG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1737487688),
+('RnwQeIxduDe7nW1irST1t9dZ8ZQGvbvc1QvlYLYG', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiTkpkZHBoRU12SzdRUnBnM2ZSekRUdm5pVnBJcUNnV3NiQjVFc3Y5SiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDg6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMvYm9va2luZ3MvMTAvY2hhcmdlcyI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1737200151),
+('wbmeT1ofz7hvaxa75ncuNvbtRoGXCrKrMOGZtlYz', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiOUdXY254ZVkydXN6NW1Ld3EzcVZYbFBOYzZxbFBkM0tmVGc3OUhvcyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjg6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1737487686),
+('XNtPBqRnzGqU8TWYSnv5FYQOl7oQcLty6iyqYgZT', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoidVlyVjVIRkRHUXFKQzc5d2ZiN3BDNTBIY2tpakFrWFdyMUVxT2lKbCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NTQ6Imh0dHA6Ly9sb2NhbGhvc3QvaXBtcy9wdWJsaWMvYWRkaXRpb25hbF9jaGFyZ2VzLzEvZWRpdCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1737263468);
 
 -- --------------------------------------------------------
 
@@ -640,6 +714,14 @@ ALTER TABLE `additional_charges`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `additional_charge_booking`
+--
+ALTER TABLE `additional_charge_booking`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `additional_charge_booking_booking_id_foreign` (`booking_id`),
+  ADD KEY `additional_charge_booking_additional_charge_id_foreign` (`additional_charge_id`);
+
+--
 -- Indexes for table `agents`
 --
 ALTER TABLE `agents`
@@ -682,6 +764,21 @@ ALTER TABLE `check_ins`
   ADD PRIMARY KEY (`id`),
   ADD KEY `check_ins_booking_id_foreign` (`booking_id`),
   ADD KEY `check_ins_room_id_foreign` (`room_id`);
+
+--
+-- Indexes for table `check_in_additional_charges`
+--
+ALTER TABLE `check_in_additional_charges`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `check_in_additional_charges_check_in_id_foreign` (`check_in_id`),
+  ADD KEY `check_in_additional_charges_additional_charge_id_foreign` (`additional_charge_id`);
+
+--
+-- Indexes for table `check_outs`
+--
+ALTER TABLE `check_outs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `check_outs_check_in_id_foreign` (`check_in_id`);
 
 --
 -- Indexes for table `customers`
@@ -821,6 +918,12 @@ ALTER TABLE `additional_charges`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `additional_charge_booking`
+--
+ALTER TABLE `additional_charge_booking`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `agents`
 --
 ALTER TABLE `agents`
@@ -830,19 +933,31 @@ ALTER TABLE `agents`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `booking_room`
 --
 ALTER TABLE `booking_room`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `check_ins`
 --
 ALTER TABLE `check_ins`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `check_in_additional_charges`
+--
+ALTER TABLE `check_in_additional_charges`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `check_outs`
+--
+ALTER TABLE `check_outs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `customers`
@@ -872,7 +987,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `payment_methods`
@@ -939,6 +1054,13 @@ ALTER TABLE `users`
 --
 
 --
+-- Constraints for table `additional_charge_booking`
+--
+ALTER TABLE `additional_charge_booking`
+  ADD CONSTRAINT `additional_charge_booking_additional_charge_id_foreign` FOREIGN KEY (`additional_charge_id`) REFERENCES `additional_charges` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `additional_charge_booking_booking_id_foreign` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `bookings`
 --
 ALTER TABLE `bookings`
@@ -959,6 +1081,19 @@ ALTER TABLE `booking_room`
 ALTER TABLE `check_ins`
   ADD CONSTRAINT `check_ins_booking_id_foreign` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `check_ins_room_id_foreign` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `check_in_additional_charges`
+--
+ALTER TABLE `check_in_additional_charges`
+  ADD CONSTRAINT `check_in_additional_charges_additional_charge_id_foreign` FOREIGN KEY (`additional_charge_id`) REFERENCES `additional_charges` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `check_in_additional_charges_check_in_id_foreign` FOREIGN KEY (`check_in_id`) REFERENCES `check_ins` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `check_outs`
+--
+ALTER TABLE `check_outs`
+  ADD CONSTRAINT `check_outs_check_in_id_foreign` FOREIGN KEY (`check_in_id`) REFERENCES `check_ins` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `permission_role`

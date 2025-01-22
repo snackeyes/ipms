@@ -33,7 +33,13 @@
                 </td>
                 <td>{{ $booking->check_in_date }}</td>
                 <td>{{ $booking->check_out_date }}</td>
-                <td>{{ ucfirst($booking->status) }}</td>
+                <td>
+                    @if($booking->checkIns->count() > 0)
+                        <span class="badge bg-success">Checked In</span>
+                    @else
+                        <span class="badge bg-warning">Not Checked In</span>
+                    @endif
+                </td>
                 <td>
                     <a href="{{ route('bookings.edit', $booking->id) }}" class="btn btn-warning btn-sm">Edit</a>
                     <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" style="display:inline;">
@@ -41,9 +47,13 @@
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
                     </form>
-                </td>
-                <td>
 
+                    <!-- Show "Manage Additional Charges" button only if booking is checked in -->
+                    @if($booking->checkIns->count() > 0)
+                        <a href="{{ route('bookings.addChargesToBooking', $booking->id) }}" class="btn btn-primary btn-sm mt-1">
+                            Manage Additional Charges
+                        </a>
+                    @endif
                 </td>
             </tr>
             @endforeach

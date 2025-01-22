@@ -19,7 +19,7 @@
             @foreach($checkOuts as $checkOut)
             <tr>
                 <td>{{ $checkOut->check_in_id }}</td>
-                <td>{{ $checkOut->checkIn->booking->customer->name }}</td>
+                <td>{{ $checkOut->checkIn->booking->customer->fullName() }}</td>
                 <td>{{ $checkOut->rest_payment }}</td>
                 <td>{{ $checkOut->discount }}</td>
                 <td>{{ $checkOut->additional_charges }}</td>

@@ -16,4 +16,10 @@ class AdditionalCharge extends Model
                     ->withPivot('amount')
                     ->withTimestamps();
     }
+    public function bookings()
+{
+    return $this->belongsToMany(Booking::class, 'additional_charge_booking')
+                ->withPivot('amount')
+                ->withTimestamps();
+}
 }

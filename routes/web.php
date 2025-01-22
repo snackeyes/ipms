@@ -56,6 +56,9 @@ Route::resource('check_outs', CheckOutController::class);
 Route::get('/check_outs/create/{checkIn}', [CheckOutController::class, 'create'])->name('check_outs.create');
 Route::post('/check_outs/store/{checkIn}', [CheckOutController::class, 'store'])->name('check_outs.store');
 
+Route::post('/bookings/{booking}/charges', [BookingController::class, 'addChargesToBooking'])->name('bookings.addChargesToBooking');
+Route::delete('/bookings/{booking}/charges/{charge}', [BookingController::class, 'removeChargeFromBooking'])->name('bookings.removeChargeFromBooking');
+Route::get('/bookings/{booking}/charges', [BookingController::class, 'showCharges'])->name('bookings.addChargesToBooking');
 
 });
 
